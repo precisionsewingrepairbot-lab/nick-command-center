@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nick's Command Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0a0f;
+            --bg2: #15151a;
+            --bg3: #1f1f28;
+            --text: #f0f0f5;
+            --text2: #a0a0b0;
+            --accent: #6366f1;
+            --accent2: #8b5cf6;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --border: #2a2a35;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+        .app { display: flex; min-height: 100vh; }
+        .sidebar {
+            width: 280px;
+            background: var(--bg2);
+            border-right: 1px solid var(--border);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        .logo {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .nav-item:hover { background: var(--bg3); }
+        .nav-item.active { background: var(--accent); color: white; }
+        .nav-icon { font-size: 18px; }
+        .main { flex: 1; padding: 24px; overflow-y: auto; }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        .header h1 { font-size: 24px; font-weight: 700; }
+        .btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn:hover { background: var(--accent2); }
+        .btn-secondary {
+            background: var(--bg3);
+            color: var(--text2);
+            border: 1px solid var(--border);
+        }
+        .btn-secondary:hover { background: var(--border); color: var(--text); }
+        .card {
+            background: var(--bg2);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
+        .card h2 {
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text2);
+            margin-bottom: 16px;
+        }
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px;
+            background: var(--bg3);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 3px solid var(--accent);
+        }
+        .task-item.high { border-left-color: var(--danger); }
+        .task-item.medium { border-left-color: var(--warning); }
+        .task-item.low { border-left-color: var(--success); }
+        .task-info { flex: 1; }
+        .task-name { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+        .task-meta { font-size: 12px; color: var(--text2); }
+        .task-freq {
+            background: var(--bg2);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .task-actions { display: flex; gap: 8px; }
+        .task-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text2);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .task-btn:hover { background: var(--accent); border-color: var(--accent); color: white; }
+        .lead-item {
+            background: var(--bg3);
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border-left: 3px solid var(--success);
+        }
+        .lead-item.new { border-left-color: var(--accent); }
+        .lead-item.hot { border-left-color: var(--danger); }
+        .lead-source {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 6px;
+        }
+        .lead-title { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+        .lead-desc { font-size: 13px; color: var(--text2); margin-bottom: 10px; line-height: 1.5; }
+        .lead-meta { font-size: 12px; color: var(--text2); margin-bottom: 10px; }
+        .lead-actions { display: flex; gap: 8px; }
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 500px;
+            background: var(--bg3);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .chat-message {
+            margin-bottom: 16px;
+            max-width: 80%;
+        }
+        .chat-message.user { margin-left: auto; }
+        .chat-message.bot { margin-right: auto; }
+        .chat-bubble {
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .chat-message.user .chat-bubble {
+            background: var(--accent);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        .chat-message.bot .chat-bubble {
+            background: var(--bg2);
+            border-bottom-left-radius: 4px;
+        }
+        .chat-input {
+            display: flex;
+            gap: 12px;
+            padding: 16px;
+            background: var(--bg2);
+            border-top: 1px solid var(--border);
+        }
+        .chat-input input {
+            flex: 1;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px 16px;
+            color: var(--text);
+            font-size: 14px;
+        }
+        .chat-input input:focus { outline: none; border-color: var(--accent); }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: var(--bg2);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 4px;
+        }
+        .stat-label { font-size: 12px; color: var(--text2); text-transform: uppercase; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text2);
+            margin-bottom: 6px;
+        }
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            color: var(--text);
+            font-size: 14px;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus { outline: none; border-color: var(--accent); }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: var(--bg2);
+            border-radius: 12px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text2);
+            font-size: 24px;
+            cursor: pointer;
+        }
+        form { padding: 20px; }
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <aside class="sidebar">
+            <div class="logo">🔧 NICK'S COMMAND CENTER</div>
+            <nav>
+                <div class="nav-item active" onclick="showTab('dashboard', this)">
+                    <span class="nav-icon">📊</span>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item" onclick="showTab('tasks', this)">
+                    <span class="nav-icon">📋</span>
+                    <span>Tasks</span>
+                </div>
+                <div class="nav-item" onclick="showTab('leads', this)">
+                    <span class="nav-icon">🎯</span>
+                    <span>Leads</span>
+                </div>
+                <div class="nav-item" onclick="showTab('social', this)">
+                    <span class="nav-icon">📱</span>
+                    <span>Social Media</span>
+                </div>
+                <div class="nav-item" onclick="showTab('strategy', this)">
+                    <span class="nav-icon">💬</span>
+                    <span>Strategy Chat</span>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="main">
+            <!-- Dashboard Tab -->
+            <div id="tab-dashboard" class="tab-content active">
+                <div class="header">
+                    <h1>Dashboard</h1>
+                    <span id="currentDate"></span>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="statTasks">5</div>
+                        <div class="stat-label">Active Tasks</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statLeads">3</div>
+                        <div class="stat-label">New Leads</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statPosts">2</div>
+                        <div class="stat-label">Posts This Week</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statRevenue">$0</div>
+                        <div class="stat-label">Pipeline Value</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>🔥 Priority Actions</h2>
+                    <div class="task-item high">
+                        <div class="task-info">
+                            <div class="task-name">Check Reddit r/sewing for repair posts</div>
+                            <div class="task-meta">Due: Next check in 2 hours</div>
+                        </div>
+                        <span class="task-freq">Every 6h</span>
+                    </div>
+                    <div class="task-item high">
+                        <div class="task-info">
+                            <div class="task-name">Find quilt guild speaking opportunities</div>
+                            <div class="task-meta">Target: Olympia, Tacoma, Seattle area</div>
+                        </div>
+                        <span class="task-freq">Daily</span>
+                    </div>
+                    <div class="task-item medium">
+                        <div class="task-info">
+                            <div class="task-name">Draft Facebook content for week</div>
+                            <div class="task-meta">3 posts needed</div>
+                        </div>
+                        <span class="task-freq">Weekly</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tasks Tab -->
+            <div id="tab-tasks" class="tab-content">
+                <div class="header">
+                    <h1>Task Manager</h1>
+                    <button class="btn" onclick="openModal('addTask')">+ Add Task</button>
+                </div>
+
+                <div class="card">
+                    <h2>🔄 Recurring Tasks</h2>
+                    <div id="recurringTasks">
+                        <div class="task-item high">
+                            <div class="task-info">
+                                <div class="task-name">Scan Reddit for sewing repair posts</div>
+                                <div class="task-meta">r/sewing, r/quilting, r/embroidery</div>
+                            </div>
+                            <span class="task-freq">Every 6h</span>
+                            <div class="task-actions">
+                                <button class="task-btn" onclick="markDone(this)">Done</button>
+                            </div>
+                        </div>
+                        <div class="task-item high">
+                            <div class="task-info">
+                                <div class="task-name">Check Facebook sewing groups</div>
+                                <div class="task-meta">PNW Quilters, Olympia Sewing, etc.</div>
+                            </div>
+                            <span class="task-freq">Every 6h</span>
+                            <div class="task-actions">
+                                <button class="task-btn" onclick="markDone(this)">Done</button>
+                            </div>
+                        </div>
+                        <div class="task-item medium">
+                            <div class="task-info">
+                                <div class="task-name">Find craft fairs & speaking gigs</div>
+                                <div class="task-meta">Puget Sound area, quilting guilds</div>
+                            </div>
+                            <span class="task-freq">Daily</span>
+                            <div class="task-actions">
+                                <button class="task-btn" onclick="markDone(this)">Done</button>
+                            </div>
+                        </div>
+                        <div class="task-item medium">
+                            <div class="task-info">
+                                <div class="task-name">Research competitors & pricing</div>
+                                <div class="task-meta">Local repair shops, Kai retailers</div>
+                            </div>
+                            <span class="task-freq">Weekly</span>
+                            <div class="task-actions">
+                                <button class="task-btn" onclick="markDone(this)">Done</button>
+                            </div>
+                        </div>
+                        <div class="task-item low">
+                            <div class="task-info">
+                                <div class="task-name">Update inventory tracking</div>
+                                <div class="task-meta">Kai scissors stock levels</div>
+                            </div>
+                            <span class="task-freq">Weekly</span>
+                            <div class="task-actions">
+                                <button class="task-btn" onclick="markDone(this)">Done</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Leads Tab -->
+            <div id="tab-leads" class="tab-content">
+                <div class="header">
+                    <h1>Lead Tracker</h1>
+                    <button class="btn" onclick="openModal('addLead')">+ Add Lead</button>
+                </div>
+
+                <div class="card">
+                    <h2>🔥 Hot Leads</h2>
+                    <div class="lead-item hot">
+                        <div class="lead-source">Reddit r/sewing • 2h ago</div>
+                        <div class="lead-title">Bernina 830 tension issues in Tacoma</div>
+                        <div class="lead-desc">"Thread keeps nesting underneath, tried everything. Anyone know a good repair person?"</div>
+                        <div class="lead-meta">12 comments • Location: Tacoma, WA</div>
+                        <div class="lead-actions">
+                            <button class="btn btn-sm">View Draft</button>
+                            <button class="btn btn-secondary btn-sm">Mark Replied</button>
+                        </div>
+                    </div>
+                    <div class="lead-item new">
+                        <div class="lead-source">Facebook • 5h ago</div>
+                        <div class="lead-title">PNW Quilters looking for speaker</div>
+                        <div class="lead-desc">March meetup in Olympia - needs someone to talk about machine maintenance</div>
+                        <div class="lead-meta">Event: March 15 • Location: Olympia</div>
+                        <div class="lead-actions">
+                            <button class="btn btn-sm">View Draft</button>
+                            <button class="btn btn-secondary btn-sm">Contact</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>📅 Events & Opportunities</h2>
+                    <div class="lead-item">
+                        <div class="lead-source">Craft Fair • April 2024</div>
+                        <div class="lead-title">Olympia Farmers Market Spring Fair</div>
+                        <div class="lead-desc">Booth opportunity to showcase Kai scissors and repair services</div>
+                        <div class="lead-meta">Deadline: March 1 • Cost: $150/booth</div>
+                        <div class="lead-actions">
+                            <button class="btn btn-sm">Research</button>
+                            <button class="btn btn-secondary btn-sm">Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Social Media Tab -->
+            <div id="tab-social" class="tab-content">
+                <div class="header">
+                    <h1>Social Media Planner</h1>
+                    <button class="btn" onclick="openModal('addPost')">+ Schedule Post</button>
+                </div>
+
+                <div class="card">
+                    <h2>📅 This Week's Content</h2>
+                    <div class="task-item">
+                        <div class="task-info">
+                            <div class="task-name">Monday: Needle Change Reminder</div>
+                            <div class="task-meta">Educational • Photo: Dull vs sharp needle</div>
+                        </div>
+                        <span class="task-freq">Draft Ready</span>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-info">
+                            <div class="task-name">Wednesday: Before/After Repair</div>
+                            <div class="task-meta">Showcase • Photo: Customer machine</div>
+                        </div>
+                        <span class="task-freq">Need Photo</span>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-info">
+                            <div class="task-name">Friday: Kai Scissors Spotlight</div>
+                            <div class="task-meta">Product • Video: Cutting demo</div>
+                        </div>
+                        <span class="task-freq">Planned</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>💡 Content Ideas</h2>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="padding: 10px 0; border-bottom: 1px solid var(--border);">🧵 "3 signs your machine needs service"</li>
+                        <li style="padding: 10px 0; border-bottom: 1px solid var(--border);">✂️ "Why I switched to Kai scissors"</li>
+                        <li style="padding: 10px 0; border-bottom: 1px solid var(--border);">🔧 "Common tension issues explained"</li>
+                        <li style="padding: 10px 0;">📍 "Free pickup areas this week"</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Strategy Chat Tab -->
+            <div id="tab-strategy" class="tab-content">
+                <div class="header">
+                    <h1>Strategy Chat</h1>
+                </div>
+
+                <div class="chat-container">
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="chat-message bot">
+                            <div class="chat-bubble">
+                                👋 Hey Nick! I'm your AI assistant. I can help with:
+                                <br><br>
+                                • Lead generation strategies<br>
+                                • Social media content ideas<br>
+                                • Pricing and positioning<br>
+                                • Event planning<br><br>
+                                What should we focus on this week?
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat-input">
+                        <input type="text" id="chatInput" placeholder="Type your message..." onkeypress="if(event.key==='Enter') sendMessage()">
+                        <button class="btn" onclick="sendMessage()">Send</button>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 20px;">
+                    <h2>🎯 This Week's Focus</h2>
+                    <p style="color: var(--text2); line-height: 1.6;">
+                        Based on your goals, I recommend focusing on:
+                        <br><br>
+                        1. <strong>Lead Gen:</strong> Reply to that Reddit post in Tacoma<br>
+                        2. <strong>Content:</strong> Post the needle change reminder Monday<br>
+                        3. <strong>Events:</strong> Contact Olympia Quilters about speaking<br>
+                        4. <strong>Sales:</strong> Follow up on Kai scissor inventory
+                    </p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add Task Modal -->
+    <div class="modal" id="addTask">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add New Task</h3>
+                <button class="modal-close" onclick="closeModal('addTask')">×</button>
+            </div>
+            <form onsubmit="saveTask(event)">
+                <div class="form-group">
+                    <label>Task Name</label>
+                    <input type="text" required placeholder="e.g., Check Facebook groups">
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea rows="2" placeholder="Details about the task..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Frequency</label>
+                    <select>
+                        <option>Every 6 hours</option>
+                        <option>Daily</option>
+                        <option>Weekly</option>
+                        <option>Monthly</option>
+                        <option>One-time</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Priority</label>
+                    <select>
+                        <option value="high">High</option>
+                        <option value="medium">Medium</option>
+                        <option value="low">Low</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('addTask')">Cancel</button>
+                    <button type="submit" class="btn">Add Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching
+        function showTab(tabName, element) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+            document.getElementById('tab-' + tabName).classList.add('active');
+            if (element) element.classList.add('active');
+        }
+
+        // Modal functions
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        // Chat functionality
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            // Add user message
+            const messages = document.getElementById('chatMessages');
+            messages.innerHTML += `
+                <div class="chat-message user">
+                    <div class="chat-bubble">${escapeHtml(text)}</div>
+                </div>
+            `;
+            input.value = '';
+            messages.scrollTop = messages.scrollHeight;
+
+            // Simulate bot response (in real version, this would go to Kimi)
+            setTimeout(() => {
+                messages.innerHTML += `
+                    <div class="chat-message bot">
+                        <div class="chat-bubble">I received your message: "${escapeHtml(text)}"<br><br>In the full version, this would connect to Kimi Claw for a real response.</div>
+                    </div>
+                `;
+                messages.scrollTop = messages.scrollHeight;
+            }, 1000);
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Mark task done
+        function markDone(btn) {
+            btn.textContent = '✓ Done';
+            btn.style.background = 'var(--success)';
+            btn.style.borderColor = 'var(--success)';
+        }
+
+        // Save task
+        function saveTask(e) {
+            e.preventDefault();
+            closeModal('addTask');
+            alert('Task added! (In full version, this saves to your task list)');
+        }
+
+        // Set current date
+        document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-US', {
+            weekday: 'long',
+            month: 'long',
+            day: 'numeric'
+        });
+    </script>
+</body>
+</html>
